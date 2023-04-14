@@ -20,11 +20,16 @@ import {
 import { lintGutter } from '@codemirror/lint';
 
 import { codeInputHandler } from '@/plugins/codemirror/inputHandlers/code.inputHandler';
+import { Extension } from '@codemirror/state';
 
-export const baseExtensions = [
+export const readOnlyEditorExtensions: readonly Extension[] = [
 	lineNumbers(),
-	highlightActiveLineGutter(),
+	EditorView.lineWrapping,
 	highlightSpecialChars(),
+];
+
+export const writableEditorExtensions: readonly Extension[] = [
+	highlightActiveLineGutter(),
 	history(),
 	foldGutter(),
 	lintGutter(),
@@ -42,5 +47,4 @@ export const baseExtensions = [
 		{ key: 'Backspace', run: deleteCharBackward, shift: deleteCharBackward },
 		indentWithTab,
 	]),
-	EditorView.lineWrapping,
 ];
