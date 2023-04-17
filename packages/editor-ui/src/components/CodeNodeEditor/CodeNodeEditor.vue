@@ -95,6 +95,9 @@ export default mixins(linterExtension, completerExtension, workflowHelpers).exte
 				this.refreshPlaceholder();
 			}
 		},
+		value(newValue) {
+			this.replaceText(newValue);
+		},
 	},
 	computed: {
 		...mapStores(useRootStore),
@@ -145,12 +148,13 @@ export default mixins(linterExtension, completerExtension, workflowHelpers).exte
 				});
 			}
 		},
-		refreshPlaceholder() {
-			if (!this.editor) return;
-
-			this.editor.dispatch({
-				changes: { from: 0, to: this.content.length, insert: this.placeholder },
+		replaceText(text: string) {
+			this.editor?.dispatch({
+				changes: { from: 0, to: this.content.length, insert: text },
 			});
+		},
+		refreshPlaceholder() {
+			this.replaceText(this.placeholder);
 		},
 		highlightLine(line: number | 'final') {
 			if (!this.editor) return;
@@ -206,9 +210,9 @@ export default mixins(linterExtension, completerExtension, workflowHelpers).exte
 		if (!this.isReadOnly) codeNodeEditorEventBus.on('error-line-number', this.highlightLine);
 
 		// empty on first load, default param value
-		if (!this.value) {
-			this.$emit('valueChanged', this.placeholder);
-		}
+		// if (!this.value) {
+		// 	this.$emit('valueChanged', this.placeholder);
+		// }
 
 		const extensions: Extension[] = [
 			...readOnlyEditorExtensions,
