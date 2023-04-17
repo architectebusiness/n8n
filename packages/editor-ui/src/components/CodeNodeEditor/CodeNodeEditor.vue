@@ -26,7 +26,8 @@ import mixins from 'vue-typed-mixins';
 import { Compartment, EditorState, Extension } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { javascript } from '@codemirror/lang-javascript';
-import { json } from '@codemirror/lang-json';
+import { json, jsonParseLinter } from '@codemirror/lang-json';
+import { linter as createLinter } from '@codemirror/lint';
 
 import { readOnlyEditorExtensions, writableEditorExtensions } from './baseExtensions';
 import { linterExtension } from './linter';
@@ -108,6 +109,14 @@ export default mixins(linterExtension, completerExtension, workflowHelpers).exte
 		placeholder(): string {
 			return placeholders[this.language]?.[this.mode] ?? '';
 		},
+		linter(): Extension | undefined {
+			switch (this.language) {
+				case 'javaScript':
+					return this.linterExtension();
+				case 'json':
+					return createLinter(jsonParseLinter());
+			}
+		},
 	},
 	methods: {
 		onMouseOver(event: MouseEvent) {
@@ -130,9 +139,11 @@ export default mixins(linterExtension, completerExtension, workflowHelpers).exte
 		reloadLinter() {
 			if (!this.editor) return;
 
-			this.editor.dispatch({
-				effects: this.linterCompartment.reconfigure(this.linterExtension()),
-			});
+			if (this.linter) {
+				this.editor.dispatch({
+					effects: this.linterCompartment.reconfigure(this.linter),
+				});
+			}
 		},
 		refreshPlaceholder() {
 			if (!this.editor) return;
@@ -205,12 +216,13 @@ export default mixins(linterExtension, completerExtension, workflowHelpers).exte
 			codeNodeEditorTheme({ maxHeight: this.maxHeight }),
 		];
 
+		if (this.linter) extensions.push(this.linterCompartment.of(this.linter));
+
 		if (this.isReadOnly) {
 			extensions.push(EditorView.editable.of(this.isReadOnly));
 		} else {
 			extensions.push(
 				...writableEditorExtensions,
-				this.linterCompartment.of(this.linterExtension()),
 				EditorView.domEventHandlers({
 					focus: () => {
 						this.isEditorFocused = true;

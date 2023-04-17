@@ -64,9 +64,9 @@
 				>
 					<div class="ignore-key-press">
 						<code-node-editor
-							class="text-editor-wrapper"
 							:value="value"
 							:defaultValue="parameter.default"
+							:language="getArgument('editorLanguage') ?? 'json'"
 							:isReadOnly="isReadOnly"
 							:maxHeight="true"
 							@valueChanged="expressionUpdated"
@@ -112,7 +112,7 @@
 					<code-node-editor
 						v-if="!codeEditDialogVisible"
 						:value="value"
-						:language="getArgument('editorLanguage')"
+						:language="getArgument('editorLanguage') ?? 'json'"
 						:isReadOnly="true"
 						:maxHeight="true"
 					/>
@@ -921,15 +921,7 @@ export default mixins(
 			}
 		},
 		getArgument(argumentName: string): string | number | boolean | undefined {
-			if (this.parameter.typeOptions === undefined) {
-				return undefined;
-			}
-
-			if (this.parameter.typeOptions[argumentName] === undefined) {
-				return undefined;
-			}
-
-			return this.parameter.typeOptions[argumentName];
+			return this.parameter.typeOptions?.[argumentName];
 		},
 		expressionUpdated(value: string) {
 			const val: NodeParameterValueType = this.isResourceLocatorParameter
