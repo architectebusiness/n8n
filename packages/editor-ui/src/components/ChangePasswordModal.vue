@@ -29,9 +29,9 @@
 </template>
 
 <script lang="ts">
-import mixins from 'vue-typed-mixins';
+import { defineComponent } from 'vue';
 
-import { showMessage } from '@/mixins/showMessage';
+import { useShowMessage } from '@/composables/useShowMessage';
 import Modal from './Modal.vue';
 import { IFormInputs } from '@/Interface';
 import { CHANGE_PASSWORD_MODAL_KEY } from '../constants';
@@ -39,7 +39,7 @@ import { mapStores } from 'pinia';
 import { useUsersStore } from '@/stores/users';
 import { createEventBus } from '@/event-bus';
 
-export default mixins(showMessage).extend({
+export default defineComponent({
 	components: { Modal },
 	name: 'ChangePasswordModal',
 	props: {
@@ -55,6 +55,11 @@ export default mixins(showMessage).extend({
 			password: '',
 			loading: false,
 			CHANGE_PASSWORD_MODAL_KEY,
+		};
+	},
+	setup() {
+		return {
+			...useShowMessage(),
 		};
 	},
 	computed: {
@@ -127,7 +132,7 @@ export default mixins(showMessage).extend({
 				this.loading = true;
 				await this.usersStore.updateCurrentUserPassword(values);
 
-				this.$showMessage({
+				this.showMessage({
 					type: 'success',
 					title: this.$locale.baseText('auth.changePassword.passwordUpdated'),
 					message: this.$locale.baseText('auth.changePassword.passwordUpdatedMessage'),
@@ -135,7 +140,7 @@ export default mixins(showMessage).extend({
 
 				this.modalBus.emit('close');
 			} catch (error) {
-				this.$showError(error, this.$locale.baseText('auth.changePassword.error'));
+				this.showError(error, this.$locale.baseText('auth.changePassword.error'));
 			}
 			this.loading = false;
 		},
