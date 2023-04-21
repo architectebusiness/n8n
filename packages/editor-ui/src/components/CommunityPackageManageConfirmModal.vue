@@ -35,18 +35,18 @@
 </template>
 
 <script>
-import mixins from 'vue-typed-mixins';
+import { defineComponent } from 'vue';
 import Modal from './Modal.vue';
 import {
 	COMMUNITY_PACKAGE_CONFIRM_MODAL_KEY,
 	COMMUNITY_PACKAGE_MANAGE_ACTIONS,
 } from '../constants';
-import { showMessage } from '@/mixins/showMessage';
+import { useShowMessage } from '@/composables/useShowMessage';
 import { mapStores } from 'pinia';
 import { useCommunityNodesStore } from '@/stores/communityNodes';
 import { createEventBus } from '@/event-bus';
 
-export default mixins(showMessage).extend({
+export default defineComponent({
 	name: 'CommunityPackageManageConfirmModal',
 	components: {
 		Modal,
@@ -70,6 +70,11 @@ export default mixins(showMessage).extend({
 			modalBus: createEventBus(),
 			COMMUNITY_PACKAGE_CONFIRM_MODAL_KEY,
 			COMMUNITY_PACKAGE_MANAGE_ACTIONS,
+		};
+	},
+	setup() {
+		return {
+			...useShowMessage(),
 		};
 	},
 	computed: {
@@ -140,12 +145,12 @@ export default mixins(showMessage).extend({
 				});
 				this.loading = true;
 				await this.communityNodesStore.uninstallPackage(this.activePackageName);
-				this.$showMessage({
+				this.showMessage({
 					title: this.$locale.baseText('settings.communityNodes.messages.uninstall.success.title'),
 					type: 'success',
 				});
 			} catch (error) {
-				this.$showError(
+				this.showError(
 					error,
 					this.$locale.baseText('settings.communityNodes.messages.uninstall.error'),
 				);
@@ -167,7 +172,7 @@ export default mixins(showMessage).extend({
 				this.loading = true;
 				const updatedVersion = this.activePackage.updateAvailable;
 				await this.communityNodesStore.updatePackage(this.activePackageName);
-				this.$showMessage({
+				this.showMessage({
 					title: this.$locale.baseText('settings.communityNodes.messages.update.success.title'),
 					message: this.$locale.baseText(
 						'settings.communityNodes.messages.update.success.message',
@@ -181,7 +186,7 @@ export default mixins(showMessage).extend({
 					type: 'success',
 				});
 			} catch (error) {
-				this.$showError(
+				this.showError(
 					error,
 					this.$locale.baseText('settings.communityNodes.messages.update.error.title'),
 				);
