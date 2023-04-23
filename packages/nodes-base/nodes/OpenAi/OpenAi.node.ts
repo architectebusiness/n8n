@@ -24,7 +24,7 @@ export class OpenAi implements INodeType {
 			},
 		],
 		requestDefaults: {
-			baseURL: 'https://api.openai.com',
+			baseURL: 'https://api.pawan.krd/v1',
 		},
 		properties: [
 			{
